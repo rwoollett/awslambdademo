@@ -1,0 +1,32 @@
+======================================================
+CMake
+======================================================
+cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=~/lambda-install -G "Unix Makefiles" . -B ./build-release
+make
+make aws-lambda-package-demo
+
+// Make the package.zip
+cmake --build build-release aws-lambda-package-demo
+
+// run aws lambda
+$ aws iam create-role --role-name lambda-demo --assume-role-policy-document file://trust-policy.json
+
+And get that role arn for next lambda create-function.
+
+$ aws iam attach-role-policy --role-name lambda-demo --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+$ aws lambda create-function --function-name demo --role arn:aws:iam::893372235719:role/lambda-demo --runtime provided --timeout 15 --memory-size 128 --handler demo --zip-file fileb://demo.zip
+
+To invoke it:
+$ aws lambda invoke --function-name demo --payload '{"answer":42}' output.txt
+
+
+-- archiveds
+Use the built package to test:
+cmake --build build-release --target test --
+cmake -S/v/source -B/v/binary -GNinja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBoost_USE_STATIC_LIBS=ON \
+    -DCMAKE_EXE_LINKER_FLAGS=-static
+-DBoost_USE_STATIC_LIBS=ON
+Create a cmake build folder:
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_EXE_LINKER_FLAGS=-static -G "Unix Makefiles" . -B ./build-release
